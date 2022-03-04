@@ -1,8 +1,17 @@
+import Feed from '@/components/Feed'
+import Header from '@/components/Header'
+import Login from '@/components/Login'
+import SideBar from '@/components/Sidebar'
+import Widgets from '@/components/Widgets'
+import { collection, getDocs, orderBy, query } from 'firebase/firestore'
+import { fireStore } from '../firebaseApp'
+import { getSession } from 'next-auth/react'
 import Head from 'next/head'
 
-export default function Home() {
+export default function Home({ session, posts }) {
+	if (!session) return <Login />
 	return (
-		<div>
+		<div className='h-screen bg-gray-100 overflow-hidden'>
 			<Head>
 				<title>Facebook</title>
 				<meta
@@ -12,8 +21,33 @@ export default function Home() {
 				<link rel='icon' href='/favicon.ico' />
 			</Head>
 
-			<h1>Hare Krishna Hare Krishna Krishna Krishna Hare Hare</h1>
-			<h1>Hare Ram Hare Ram Ram Ram Hare Hare</h1>
+			{/* Header */}
+			<Header />
+
+			<main className='flex'>
+				{/* Sidebar */}
+				<SideBar />
+				{/* Feed */}
+				<Feed posts={posts} />
+				{/* Widgets */}
+				<Widgets />
+			</main>
 		</div>
 	)
+}
+
+export async function getServerSideProps(context) {
+	// get the user
+	const session = await getSession(context)
+	const posts = await getDocs(
+		query(collection(fireStore, 'posts'), orderBy('timestamp', 'desc'))
+	)
+	const docs = posts.docs.map((post) => ({
+		id: post.id,
+		...post.data(),
+		timestamp: null,
+	}))
+	return {
+		props: { session, posts: docs },
+	}
 }
