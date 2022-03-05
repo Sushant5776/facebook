@@ -57,13 +57,13 @@ const Header = () => {
 				<Image
 					onClick={signOut}
 					className='rounded-full cursor-pointer'
-					src={session.user.image}
+					src={session?.user.image}
 					width={40}
 					height={40}
 					alt=''
 				/>
 				<p className='whitespace-nowrap font-semibold pr-3'>
-					{session.user.name}
+					{session?.user.name}
 				</p>
 				<ViewGridIcon className='icon' />
 				<ChatIcon className='icon' />
